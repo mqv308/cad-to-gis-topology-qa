@@ -1,4 +1,6 @@
-# CAD-to-GIS Topology QA/QC & WebGIS Pipeline
+﻿# CAD-to-GIS Topology QA/QC & WebGIS Pipeline
+
+> **[Launch Live 2D/3D Interactive WebGIS Demo ->](https://mqv308.github.io/cad-to-gis-topology-qa/)**
 
 Production geospatial QA/QC engine built on **GDAL/OGR, PyProj, and Shapely** using a **2-Layer Legal-Safe (Human-in-the-Loop)** architecture.
 
@@ -24,12 +26,12 @@ Designed to ingest messy CAD (`DGN V7/V8`, `DWG`, `DXF`) and GIS (`SHP`, `GeoJSO
 
 ## Deliverables Generated Per Run
 
-- `*.gpkg` — Cleaned GeoPackage in native projected CRS
-- `*.geojson` — WGS84 GeoJSON ready for web/API consumption
-- `*.kml` — Google Earth KML with styled error overlays
-- `*_webgis.html` — Standalone MapLibre GL JS interactive QA viewer (filter clean vs. error parcels + search)
-- `*_qa_errors.csv` — Excel-ready QA/QC checklist for engineers
-- `*_report.json` — Machine-readable summary metrics
+- `*.gpkg` â€” Cleaned GeoPackage in native projected CRS
+- `*.geojson` â€” WGS84 GeoJSON ready for web/API consumption
+- `*.kml` â€” Google Earth KML with styled error overlays
+- `*_webgis.html` â€” Standalone MapLibre GL JS interactive QA viewer (filter clean vs. error parcels + search)
+- `*_qa_errors.csv` â€” Excel-ready QA/QC checklist for engineers
+- `*_report.json` â€” Machine-readable summary metrics
 
 ---
 
@@ -64,3 +66,4 @@ Need a custom CAD-to-GIS pipeline, PostGIS migration, or interactive MapLibre/Le
 
 - **Freelancer**: [freelancer.com/u/nexusgeo308](https://www.freelancer.com/u/nexusgeo308)
 - **Fiverr**: [fiverr.com/s/ae7VwbN](https://www.fiverr.com/s/ae7VwbN)
+
