@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cadastral QA/QC &amp; 3D Urban Demo · Nexus Geospatial Studio</title>
 <meta name="description" content="Interactive WebGIS demo: cadastral topology QA/QC and 3D urban extrusion with MapLibre GL JS. Built by Nexus Geospatial Studio.">
-<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
-<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.1.0/dist/maplibre-gl.css">
+<script src="https://unpkg.com/maplibre-gl@5.1.0/dist/maplibre-gl.js"></script>
 <style>
   :root{
     --bg:#0b0f14; --panel:rgba(13,17,23,.88); --panel-solid:#0d1117;
@@ -21,7 +21,6 @@
   html,body{margin:0;height:100%;background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;-webkit-font-smoothing:antialiased}
   #map{position:absolute;inset:0}
 
-  /* ---------- Panel ---------- */
   .panel{
     position:absolute;top:12px;left:12px;width:320px;max-height:calc(100% - 24px);overflow:auto;
     background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -37,7 +36,6 @@
   .section{padding:10px 14px;border-top:1px solid var(--border)}
   .section-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.9px;color:var(--dim);margin-bottom:8px;font-weight:600}
 
-  /* Mode switch */
   .seg{display:grid;grid-template-columns:1fr 1fr;background:#0a0d12;border:1px solid var(--border);border-radius:9px;padding:3px;gap:3px}
   .seg button{background:none;border:0;color:var(--muted);padding:8px 6px;border-radius:7px;cursor:pointer;font:inherit;font-weight:600;font-size:12px;transition:background .2s,color .2s}
   .seg button:hover{color:var(--text)}
@@ -45,7 +43,6 @@
   .seg small{display:block;font-weight:400;font-size:10.5px;color:var(--dim);margin-top:1px}
   .seg button.active small{color:var(--muted)}
 
-  /* Search */
   .search{display:flex;gap:6px}
   .search input{flex:1;min-width:0;background:#0a0d12;border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font:inherit;font-family:var(--mono);font-size:12px;outline:none;transition:border-color .2s}
   .search input:focus{border-color:var(--accent)}
@@ -56,9 +53,9 @@
   .btn.primary{background:#0c4a6e;border-color:#0369a1}
   .btn.primary:hover{background:#075985}
   .btn.block{width:100%;display:flex;align-items:center;justify-content:center;gap:8px}
+  .btn .xc{font-family:var(--mono);font-size:11px;background:rgba(0,0,0,.3);padding:1px 6px;border-radius:5px}
   .hint{font-size:11px;color:var(--dim);margin-top:6px;min-height:14px}
 
-  /* Filters */
   .chips{display:flex;flex-direction:column;gap:5px}
   .chip{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:8px;border:1px solid var(--border);background:#0a0d12;cursor:pointer;user-select:none;transition:opacity .2s,border-color .2s}
   .chip:hover{border-color:var(--border-strong)}
@@ -68,7 +65,6 @@
   .chip .cnt{font-family:var(--mono);font-size:12px;color:var(--muted)}
   .chip.off{opacity:.38}
 
-  /* Stats */
   .stats{display:grid;grid-template-columns:1fr 1fr;gap:6px}
   .stat{background:#0a0d12;border:1px solid var(--border);border-radius:9px;padding:9px 10px}
   .stat.wide{grid-column:1 / -1}
@@ -79,7 +75,6 @@
   .bar{display:flex;height:6px;border-radius:4px;overflow:hidden;margin-top:9px;background:#1e293b}
   .bar span{display:block;height:100%;transition:width .4s}
 
-  /* Legend */
   .legend-2d{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted)}
   .legend-2d div{display:flex;align-items:center;gap:8px}
   .legend-2d i{width:14px;height:10px;border-radius:2px;background:var(--c);opacity:.85;border:1px solid var(--c)}
@@ -89,29 +84,27 @@
   .meta{font-size:11px;color:var(--dim);line-height:1.5}
   .meta b{color:var(--muted);font-weight:500}
 
-  /* Credit card */
   .credit{
     position:absolute;right:12px;bottom:12px;z-index:5;background:var(--panel);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-    border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:270px
+    border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:330px
   }
   .credit-title{font-size:12px;color:var(--muted)}
   .credit-title b{color:var(--text);font-weight:650}
   .credit-sub{font-size:10.5px;color:var(--dim);margin-top:2px}
-  .credit-links{display:flex;gap:6px;margin-top:8px}
+  .credit-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .credit-links a{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--text);font-size:11.5px;font-weight:600;padding:5px 9px;border-radius:7px;background:#1e293b;border:1px solid var(--border-strong);transition:background .2s}
   .credit-links a:hover{background:#273449}
   .credit-links svg{width:13px;height:13px;fill:currentColor}
+  .credit-links .fi{width:14px;height:14px;border-radius:50%;background:#1dbf73;color:#0b0f14;font-size:8.5px;font-weight:800;display:grid;place-items:center;letter-spacing:-.2px}
 
-  /* Toast */
   .toast{position:absolute;left:50%;top:14px;transform:translate(-50%,-20px);opacity:0;z-index:10;background:#0f172a;border:1px solid var(--border-strong);color:var(--text);padding:8px 14px;border-radius:9px;font-size:12px;transition:all .25s;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
   .toast.show{opacity:1;transform:translate(-50%,0)}
+  .toast.warn{border-color:rgba(250,204,21,.5);color:#fde68a}
 
-  /* Loader */
   .loader{position:absolute;inset:0;display:grid;place-items:center;background:var(--bg);z-index:20;transition:opacity .4s}
   .loader.hide{opacity:0;pointer-events:none}
   .loader div{color:var(--muted);font-size:12px;letter-spacing:.5px}
 
-  /* MapLibre overrides */
   .maplibregl-popup-content{background:var(--panel-solid);color:var(--text);border:1px solid var(--border-strong);border-radius:11px;padding:0;box-shadow:0 14px 40px rgba(0,0,0,.55)}
   .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,.maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,.maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip{border-top-color:var(--panel-solid)}
   .maplibregl-popup-anchor-top .maplibregl-popup-tip,.maplibregl-popup-anchor-top-left .maplibregl-popup-tip,.maplibregl-popup-anchor-top-right .maplibregl-popup-tip{border-bottom-color:var(--panel-solid)}
@@ -175,7 +168,7 @@
   <div class="section">
     <div class="section-label">Find parcel</div>
     <form class="search" id="searchForm" autocomplete="off">
-      <input id="searchInput" list="parcelList" placeholder="e.g. LT-03-005" spellcheck="false" aria-label="Parcel ID">
+      <input id="searchInput" list="parcelList" placeholder="e.g. LT-07-128" spellcheck="false" aria-label="Parcel ID">
       <datalist id="parcelList"></datalist>
       <button class="btn" type="submit">Go</button>
     </form>
@@ -201,9 +194,9 @@
       </div>
     </div>
     <div style="display:flex;gap:6px;margin-top:8px">
-      <button class="btn primary block" id="exportBtn" type="button">
+      <button class="btn primary block" id="exportBtn" type="button" title="Exports QA errors matching the active filter">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
-        Export QA errors (.csv)
+        Export QA errors (.csv) <span class="xc" id="expCnt">0</span>
       </button>
       <button class="btn" id="resetBtn" type="button" title="Reset view">⟲</button>
     </div>
@@ -224,7 +217,7 @@
   </div>
 
   <div class="section meta">
-    <b>Data:</b> 40 synthetic demo parcels, Láng Thượng area, Hà Nội.<br>
+    <b>Data:</b> <span id="metaCount">0</span> synthetic demo parcels (map sheets 07–08), Láng Thượng area, Hà Nội.<br>
     <b>CRS:</b> WGS84 (EPSG:4326). Areas computed in local metric plane.<br>
     <b>QA rules:</b> overlap &gt; 0.01 m², sliver thinness 4πA/P² &lt; 0.15.
   </div>
@@ -242,6 +235,10 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.1 3 16 6.2 23 3zM5.4 21 11 15.2 8.5 12.6zM13.6 3.4l-2.2 3 1.9 3.1zM1 3l2.2 3.4h8.5zM9.1 12.1l2.6 2.7 4.8-8.1z"/></svg>
       Freelancer
     </a>
+    <a href="https://www.fiverr.com/s/ae7VwbN" target="_blank" rel="noopener noreferrer">
+      <span class="fi" aria-hidden="true">fi</span>
+      Fiverr
+    </a>
   </div>
 </div>
 
@@ -255,27 +252,53 @@
   const ROT = 14 * Math.PI / 180;
   const M_LAT = 111320;
   const M_LNG = 111320 * Math.cos(ORIGIN.lat * Math.PI / 180);
-  const OVERLAP_M = 1.6;
 
-  const BLOCKS = [
-    { sheet: '01', widths: [9.5, 11.0, 8.2, 12.4, 10.0, 7.8, 13.5, 9.0],  overlap: [2], sliver: [] },
-    { sheet: '02', widths: [12.0, 8.5, 0.9, 10.6, 11.2, 9.4, 8.0, 14.0], overlap: [],  sliver: [2] },
-    { sheet: '03', widths: [10.2, 9.8, 12.0, 7.5, 11.5, 10.0, 9.2, 12.8], overlap: [4], sliver: [] },
-    { sheet: '04', widths: [8.8, 13.0, 9.6, 10.4, 0.7, 12.2, 9.0, 11.0], overlap: [],  sliver: [4] },
-    { sheet: '05', widths: [11.4, 9.0, 10.8, 8.6, 12.5, 9.7, 0.8, 13.0], overlap: [0], sliver: [6] }
+  const RAW = [
+    ['07-112','Commercial','Enterprise',34.8,'CLEAN','',[0,6,6,0,22,-0.57,21.6,11,22,22,-0.94,22]],
+    ['07-113','Residential','Household',14.4,'CLEAN','',[22,-0.57,26.6,-0.74,26.9,21.64,22,22,21.6,11]],
+    ['07-114','Residential','Individual',18.0,'OVERLAP_ERROR','Overlaps LT-08-045 by 6.29 m² (boundary encroachment).',[26.6,-0.74,31,-0.9,31.4,21.31,31.4,22.71,26.9,23.04,26.9,21.64]],
+    ['07-115','Residential','Household',10.8,'CLEAN','',[31,-0.9,35.8,-1.07,36.1,20.97,31.4,21.31]],
+    ['07-116','Residential','Household',21.6,'CLEAN','',[35.8,-1.07,41.2,-1.26,41.2,11,41.2,16.2,41.2,20.6,36.1,20.97]],
+    ['07-117','Mixed-Use','Individual',18.0,'CLEAN','',[41.2,-1.26,50.4,-1.6,52.09,1.6,52.37,11,41.2,11]],
+    ['07-121','Residential','Household',10.8,'CLEAN','',[41.2,11,52.37,11,52.52,16.2,41.2,16.2]],
+    ['07-122','Residential','Individual',7.2,'CLEAN','',[41.2,16.2,52.52,16.2,52.6,19,51,19,51,20.9,41.2,20.6]],
+    ['07-124','Mixed-Use','Individual',21.6,'CLEAN','',[56.1,1.6,57.6,-1.85,63.2,-2.06,63.44,12,56.4,12]],
+    ['07-125','Residential','Household',14.4,'CLEAN','',[56.4,12,63.44,12,63.6,21.28,59.5,21.1,59.5,19,56.6,19]],
+    ['07-126','Residential','Individual',18.0,'CLEAN','',[63.2,-2.06,68.4,-2.24,68.9,21.49,64,21.3,63.6,21.28,63.44,12]],
+    ['07-127','Residential','Household',14.4,'OVERLAP_ERROR','Overlapped by LT-07-128 (14.47 m²). Boundary must be resolved by surveyor.',[68.4,-2.24,73.5,-2.43,73.8,21.68,68.9,21.49]],
+    ['07-128','Commercial','Enterprise',52.0,'OVERLAP_ERROR','Overlaps LT-07-127 by 14.47 m² (boundary encroachment).',[72.3,-2.38,91,-3.05,91.6,12,91.3,22.37,73.8,21.68]],
+    ['07-131','Mixed-Use','Enterprise',25.2,'CLEAN','',[91,-3.05,96.2,-3.24,96.6,22.46,92,22.4,91.3,22.37,91.6,12]],
+    ['07-132','Residential','Household',18.0,'CLEAN','',[96.2,-3.24,101,-3.41,101.5,22.52,96.6,22.46]],
+    ['07-X01','Unclassified','Unassigned',0,'SLIVER_WARNING','Sliver between LT-07-132 and LT-07-133: 12.98 m², thinness 4πA/P² = 0.058 (< 0.15).',[101,-3.41,101.55,-3.43,101.95,22.53,101.5,22.52]],
+    ['07-133','Residential','Individual',14.4,'CLEAN','',[101.55,-3.43,106.3,-3.6,106.6,22.59,101.95,22.53]],
+    ['07-134','Residential','Household',21.6,'CLEAN','',[106.3,-3.6,111.5,-3.79,111,10.5,112,22.66,106.6,22.59]],
+    ['07-135','Residential','Household',10.8,'CLEAN','',[111.5,-3.79,118,-4.02,118.2,12.5,124,12.6,124.2,22.82,112,22.66,111,10.5]],
+    ['07-136','Residential','Individual',18.0,'CLEAN','',[118,-4.02,123.8,-4.23,124,12.6,118.2,12.5]],
+    ['07-138','Mixed-Use','Enterprise',28.8,'CLEAN','',[123.8,-4.23,134,-4.6,139,1.2,138.2,23,124.2,22.82,124,12.6]],
+    ['08-041','Residential','Household',14.4,'CLEAN','',[-0.94,22,14.2,22,14.1,31,6.5,31,6.5,40.29,-2,40]],
+    ['08-X01','Unclassified','Unassigned',0,'SLIVER_WARNING','Sliver between LT-08-041 and LT-08-042: 2.28 m², thinness 4πA/P² = 0.114 (< 0.15).',[6.5,31,14.1,31,6.5,31.6]],
+    ['08-042','Residential','Individual',18.0,'CLEAN','',[6.5,31.6,14.1,31,14.4,40.56,6.5,40.29]],
+    ['08-043','Residential','Household',10.8,'CLEAN','',[14.2,22,19.8,22,20.1,40.75,14.4,40.56,14.1,31]],
+    ['08-045','Public / Institutional','State',16.0,'OVERLAP_ERROR','Overlapped by LT-07-114 (6.29 m²). Boundary must be resolved by surveyor.',[19.8,22,22,22,34,21.12,34.3,30,34.6,41.24,20.1,40.75]],
+    ['08-046','Residential','Household',21.6,'CLEAN','',[34,21.12,39,20.76,39.4,41.41,34.6,41.24,34.3,30]],
+    ['08-047','Residential','Individual',18.0,'OVERLAP_ERROR','Overlaps LT-08-048 by 13.57 m² (boundary encroachment).',[39,20.76,41.2,20.6,45.1,20.72,44,41.56,39.4,41.41]],
+    ['08-048','Residential','Household',14.4,'OVERLAP_ERROR','Overlapped by LT-08-047 (13.57 m²). Boundary must be resolved by surveyor.',[43.8,20.68,48,20.81,48.3,41.71,44,41.56]],
+    ['08-050','Residential','Household',10.8,'CLEAN','',[48,20.81,51,20.9,51,25,55.2,25,55.4,41.95,48.3,41.71]],
+    ['08-051','Residential','Individual',14.4,'CLEAN','',[55.2,25,59.5,25,59.5,21.1,64,21.3,64.2,42.25,55.4,41.95]],
+    ['08-X02','Unclassified','Unassigned',0,'SLIVER_WARNING','Sliver between LT-08-052 and LT-07-126: 7.88 m², thinness 4πA/P² = 0.049 (< 0.15).',[64,21.3,69.5,21.52,75,21.73,86.5,22.18,75,22.43,69.5,21.87]],
+    ['08-052','Residential','Household',18.0,'CLEAN','',[64,21.3,69.5,21.87,69.8,42.44,64.2,42.25]],
+    ['08-053','Residential','Individual',21.6,'CLEAN','',[69.5,21.87,75,22.43,75.4,42.63,69.8,42.44]],
+    ['08-054','Mixed-Use','Individual',25.2,'CLEAN','',[75,22.43,86.5,22.18,86.4,31.5,81,31.5,81.2,42.82,75.4,42.63]],
+    ['08-055','Residential','Household',14.4,'CLEAN','',[81,31.5,86.4,31.5,86.6,43.01,81.2,42.82]],
+    ['08-057','Residential','Household',18.0,'CLEAN','',[86.5,22.18,92,22.4,92.3,43.2,86.6,43.01,86.4,31.5]],
+    ['08-058','Green Space','State',0.5,'CLEAN','',[92,22.4,104.5,22.56,104.8,43.63,92.3,43.2]],
+    ['08-060','Residential','Household',18.0,'CLEAN','',[104.5,22.56,115.6,22.71,116.4,31,115.9,44,104.8,43.63]],
+    ['08-061','Residential','Individual',21.6,'CLEAN','',[115.6,22.71,121,22.78,121.3,44.19,115.9,44,116.4,31]],
+    ['08-062','Mixed-Use','Individual',25.2,'CLEAN','',[121,22.78,128,22.87,128.3,44.42,121.3,44.19]],
+    ['08-064','Commercial','Enterprise',43.2,'CLEAN','',[128,22.87,138.2,23,137.6,39.5,133.5,44.6,128.3,44.42]]
   ];
 
-  function mulberry32(seed) {
-    return function () {
-      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-      let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-      return ((t ^ t >>> 14) >>> 0) / 4294967296;
-    };
-  }
   const r2 = v => Math.round(v * 100) / 100;
-  const r1 = v => Math.round(v * 10) / 10;
-
   function toLngLat([x, y]) {
     const xr = x * Math.cos(ROT) - y * Math.sin(ROT);
     const yr = x * Math.sin(ROT) + y * Math.cos(ROT);
@@ -293,84 +316,29 @@
   }
 
   function buildParcels() {
-    const rand = mulberry32(308);
-    const STREET = 12;
-    const features = [];
-    let y0 = 0;
-
-    BLOCKS.forEach((blk, b) => {
-      const D = 22 + Math.round(rand() * 40) / 10;
-      const xs = [0];
-      blk.widths.forEach(w => xs.push(xs[xs.length - 1] + w));
-      const sk = xs.map(() => (rand() - 0.5) * 1.6);
-      blk.sliver.forEach(i => { sk[i + 1] = sk[i]; });
-
-      const ids = blk.widths.map((_, i) => `LT-${blk.sheet}-${String(i + 1).padStart(3, '0')}`);
-
-      blk.widths.forEach((w, i) => {
-        const isOvA = blk.overlap.includes(i);
-        const isOvB = blk.overlap.includes(i - 1);
-        const isSliver = blk.sliver.includes(i);
-        const ext = isOvA ? OVERLAP_M : 0;
-
-        const ringM = [
-          [xs[i], y0],
-          [xs[i + 1] + ext, y0],
-          [xs[i + 1] + sk[i + 1] + ext, y0 + D],
-          [xs[i] + sk[i], y0 + D],
-          [xs[i], y0]
-        ];
-        const area = ringArea(ringM);
-        const perim = ringPerimeter(ringM);
-
-        let zoning, owner, height;
-        const z = rand(), o = rand(), h = rand();
-        if (isSliver) {
-          zoning = 'Unclassified'; owner = 'Unassigned'; height = 0;
-        } else if (z < (b === 0 ? 0.25 : 0.5)) {
-          zoning = 'Residential'; owner = o < 0.6 ? 'Household' : 'Individual'; height = r1(7.2 + Math.floor(h * 5) * 3.6);
-        } else if (z < 0.68) {
-          zoning = 'Mixed-Use'; owner = o < 0.5 ? 'Individual' : 'Enterprise'; height = r1(14.4 + Math.floor(h * 5) * 3.6);
-        } else if (z < 0.84) {
-          zoning = 'Commercial'; owner = o < 0.8 ? 'Enterprise' : 'Organization'; height = r1(28 + h * 44);
-        } else if (z < 0.93) {
-          zoning = 'Public / Institutional'; owner = 'State'; height = r1(10 + h * 12);
-        } else {
-          zoning = 'Green Space'; owner = 'State'; height = 0.5;
-        }
-
-        let status = 'CLEAN', detail = 'No topology issues detected.';
-        if (isOvA) {
-          status = 'OVERLAP_ERROR';
-          detail = `Overlaps ${ids[i + 1]} by ${(OVERLAP_M * D).toFixed(2)} m² (east boundary encroaches ${OVERLAP_M.toFixed(1)} m).`;
-        } else if (isOvB) {
-          status = 'OVERLAP_ERROR';
-          detail = `Overlapped by ${ids[i - 1]} (${(OVERLAP_M * D).toFixed(2)} m²). Boundary must be resolved by surveyor.`;
-        } else if (isSliver) {
-          status = 'SLIVER_WARNING';
-          const thin = 4 * Math.PI * area / (perim * perim);
-          detail = `Sliver polygon: mean width ${w.toFixed(1)} m, thinness 4πA/P² = ${thin.toFixed(3)} (< 0.15).`;
-        }
-
-        features.push({
+    return {
+      type: 'FeatureCollection',
+      features: RAW.map(([id, zoning, owner, height, status, detail, flat]) => {
+        const ring = [];
+        for (let i = 0; i < flat.length; i += 2) ring.push([flat[i], flat[i + 1]]);
+        ring.push(ring[0]);
+        return {
           type: 'Feature',
           properties: {
-            parcel_id: ids[i],
-            sheet_no: blk.sheet,
+            parcel_id: 'LT-' + id,
+            sheet_no: id.slice(0, 2),
             owner_type: owner,
             zoning,
-            area_m2: r2(area),
-            perimeter_m: r2(perim),
+            area_m2: r2(ringArea(ring)),
+            perimeter_m: r2(ringPerimeter(ring)),
             height_m: height,
             qa_status: status,
-            qa_detail: detail
+            qa_detail: detail || 'No topology issues detected.'
           },
-          geometry: { type: 'Polygon', coordinates: [ringM.map(toLngLat)] }
-        });
-      });
-      y0 += D + STREET;
-    });
-    return { type: 'FeatureCollection', features };
+          geometry: { type: 'Polygon', coordinates: [ring.map(toLngLat)] }
+        };
+      })
+    };
   }
 
   const DATA = buildParcels();
@@ -401,11 +369,13 @@
   }
 
   let toastTimer;
-  function toast(msg) {
+  function toast(msg, warn = false) {
     const t = $('#toast');
-    t.textContent = msg; t.classList.add('show');
+    t.textContent = msg;
+    t.classList.toggle('warn', warn);
+    t.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
   }
 
   const STATUS = {
@@ -470,7 +440,7 @@
 
   function armStyleTimeout() {
     clearTimeout(styleTimer);
-    styleTimer = setTimeout(() => { if (!styleReady) nextStyle('timeout'); }, 9000);
+    styleTimer = setTimeout(() => { if (!styleReady) nextStyle(); }, 9000);
   }
   function nextStyle() {
     if (styleIdx >= STYLES.length - 1) return;
@@ -600,7 +570,11 @@
   document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
 
   const checkboxes = [...document.querySelectorAll('.chip input')];
-  function activeStatuses() { return checkboxes.filter(c => c.checked).map(c => c.value); }
+  const activeStatuses = () => checkboxes.filter(c => c.checked).map(c => c.value);
+  const filteredErrors = () => {
+    const active = activeStatuses();
+    return DATA.features.filter(f => f.properties.qa_status !== 'CLEAN' && active.includes(f.properties.qa_status));
+  };
 
   function applyFilter() {
     const active = activeStatuses();
@@ -621,6 +595,7 @@
     $('#stTotal').innerHTML = `${vis.length}<span class="u">/ ${all.length}</span>`;
     $('#stErrors').textContent = errs;
     $('#stArea').textContent = fmt(area, 2);
+    $('#expCnt').textContent = errs;
     $('#statScope').textContent = vis.length === all.length ? '· all parcels' : '· filtered';
     const spans = $('#stBar').children;
     STATUS_KEYS.forEach((k, i) => {
@@ -642,6 +617,7 @@
         <tr><th>Owner type</th><td>${esc(p.owner_type)}</td></tr>
         <tr><th>Area</th><td>${fmt(p.area_m2, 2)} m²</td></tr>
         <tr><th>Perimeter</th><td>${fmt(p.perimeter_m, 2)} m</td></tr>
+        <tr><th>Vertices</th><td>${f.geometry.coordinates[0].length - 1}</td></tr>
         <tr><th>Height</th><td>${fmt(p.height_m, 1)} m${floors}</td></tr>
         <tr><th>Map sheet</th><td>${esc(p.sheet_no)}</td></tr>
         <tr><th>Centroid</th><td class="mono">${coord}</td></tr>
@@ -747,23 +723,32 @@
   });
 
   $('#exportBtn').addEventListener('click', () => {
-    const rows = DATA.features.filter(f => f.properties.qa_status !== 'CLEAN');
+    const rows = filteredErrors();
+    if (!rows.length) {
+      const active = activeStatuses();
+      toast(active.length
+        ? `No QA errors in current filter (${active.join(', ')}). Nothing to export.`
+        : 'No QA status selected. Tick OVERLAP_ERROR or SLIVER_WARNING to export.', true);
+      return;
+    }
     const head = ['parcel_id', 'qa_status', 'qa_detail', 'sheet_no', 'zoning', 'owner_type', 'area_m2', 'perimeter_m', 'height_m', 'centroid_lng', 'centroid_lat'];
     const cell = v => { const s = String(v ?? ''); return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
     const lines = [head.join(',')].concat(rows.map(f => {
       const p = f.properties, c = centroidOf(f);
       return [p.parcel_id, p.qa_status, p.qa_detail, p.sheet_no, p.zoning, p.owner_type, p.area_m2, p.perimeter_m, p.height_m, c[0].toFixed(7), c[1].toFixed(7)].map(cell).join(',');
     }));
+    const tag = [...new Set(rows.map(f => f.properties.qa_status))].sort().join('_').toLowerCase();
     const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `nexus_qa_errors_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `nexus_qa_${tag}_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 0);
-    toast(`Exported ${rows.length} QA records`);
+    toast(`Exported ${rows.length} QA record${rows.length > 1 ? 's' : ''}`);
   });
 
+  $('#metaCount').textContent = DATA.features.length;
   $('#resetBtn').addEventListener('click', () => resetView(true));
   $('#collapse').addEventListener('click', () => {
     const p = $('#panel');
